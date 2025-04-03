@@ -1,0 +1,9 @@
+```python
+from odoo import models, fields
+
+class YourModel(models.Model):
+    _name = 'your.model'
+    
+    limit = fields.Integer(string='Limit')
+    exception_task = fields.Many2one('task.model', string='Exception Task')
+```
