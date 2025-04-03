@@ -1,0 +1,70 @@
+To add a button that opens the purchase screen from the Inventory screen in Odoo, you'll need to customize the Odoo views, typically using XML. Below are the steps to accomplish this, assuming you're familiar with Odoo development and have access to the necessary modules.
+
+### Steps to Add the Button in the Inventory Screen
+
+1. **Create a Custom Module (if you haven't already):**
+   If you don't already have a custom module, you may need to create one to hold your customizations.
+
+2. **Add an XML View Modification:**
+   You will modify the `inventory` view to add a button that links to the purchase screen. Assuming you're modifying the Inventory module, you would create an XML file in your custom module.
+
+3. **Locate the Inventory View:**
+   Identify which inventory view you want to modify (e.g., the form view of a specific model).
+
+4. **Define the Button in XML:**
+   You can add a button that opens the purchase order form. Use the `button` tag in the XML to create the button. Here's an example code snippet to add to your XML file:
+
+   ```xml
+   <odoo>
+       <data>
+           <record id="view_inventory_form_inherit" model="ir.ui.view">
+               <field name="name">inventory.form.inherit</field>
+               <field name="model">stock.picking</field>  <!-- Adjust the model as necessary -->
+               <field name="inherit_id" ref="stock.vpickform"/>  <!-- Inherit from the appropriate view -->
+               <field name="arch" type="xml">
+                   <xpath expr="//header" position="inside">
+                       <button name="action_open_purchase_order" type="object" string="Open Purchase Order" class="btn-primary"/>
+                   </xpath>
+               </field>
+           </record>
+
+           <record id="action_open_purchase_order" model="ir.actions.server">
+               <field name="name">Open Purchase Order</field>
+               <field name="model_id" ref="purchase.model_purchase_order"/>
+               <field name="binding_model_id" ref="stock.model_stock_picking"/>
+               <field name="state">code</field>
+               <field name="code">action = model.open_purchase_order()</field>
+           </record>
+       </data>
+   </odoo>
+   ```
+
+5. **Implement the Method:**
+   In the model file where your `stock.picking` or relevant model is defined, you will need to add a method to handle the button click event.
+
+   Here’s a simple implementation you can include in your Python file:
+
+   ```python
+   from odoo import models, api
+
+   class StockPicking(models.Model):
+       _inherit = 'stock.picking'
+
+       @api.multi
+       def open_purchase_order(self):
+           action = self.env.ref('purchase.purchase_rfq').read()[0]
+           return action
+   ```
+
+6. **Update Your Module:**
+   Don't forget to update your module. You can do this by going to the Apps menu, and clicking on ‘Update Apps List’ if your custom module is not visible, then you can upgrade your custom module.
+
+7. **Test Your Changes:**
+   Restart your Odoo server and refresh your web interface. Navigate to the Inventory screen and you should see the new button to open the Purchase screen.
+
+### Notes:
+- Make sure you have the necessary access rights set up for users who will see the button.
+- Adjust the XML and Python code according to the actual names and models you're using.
+- You may need to clear the browser cache or refresh the Odoo interface to see the changes.
+
+This implementation provides a basic example. Depending on your specific requirements and Odoo version, the implementation details may vary.
