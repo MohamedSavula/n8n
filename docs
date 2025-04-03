@@ -1,0 +1,50 @@
+To accomplish the task of filling in the date order in the sales order screen and converting it from date to string in Odoo, you'll typically follow these steps:
+
+1. **Access the Sales Order Model**: You need to identify the model for the sales order, which is usually `sale.order`.
+
+2. **Locate the Date Field**: The field for the order date is usually named `date_order`.
+
+3. **Create a Method to Convert Date to String**: You can create a method that retrieves the date, converts it to a string format, and updates the order.
+
+### Example Code
+
+Here's a basic implementation in Python for an Odoo module:
+
+```python
+from odoo import models, fields, api
+from datetime import datetime
+
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+    
+    date_order_string = fields.Char(string='Order Date String', compute='_compute_date_order_string', store=True)
+
+    @api.depends('date_order')
+    def _compute_date_order_string(self):
+        for order in self:
+            if order.date_order:
+                order.date_order_string = order.date_order.strftime('%Y-%m-%d %H:%M:%S')  # Convert to string in desired format
+            else:
+                order.date_order_string = ''
+```
+
+### Steps to Implement:
+
+1. **Create or Update Your Module**: If you don't already have a custom module, create one. If you do, open your existing module.
+
+2. **Add the Code**: Add the code snippet above to the appropriate model file, typically found in `models/`.
+
+3. **Update the Odoo Database**: After editing your module, make sure to update your Odoo database:
+   - Go to the terminal where your Odoo server is running.
+   - Run `./odoo-bin -u your_module_name`.
+
+4. **Restart Odoo Server**: Don't forget to restart the Odoo server to see the changes reflected.
+
+5. **Testing**: Go to the Sales Order screen and check if the `date_order_string` field is showing the order date as a string.
+
+### Additional Considerations
+
+- You can customize the string format in the `strftime` function according to your requirements.
+- Make sure you have the necessary access rights to modify models in Odoo.
+
+If you need further assistance or specific details about the Odoo version you’re working with, let me know!
